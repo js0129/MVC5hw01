@@ -10,115 +10,112 @@ using MVC5hw.Models;
 
 namespace MVC5hw.Controllers
 {
-    public class CustomerController : Controller
+    public class PersonController : Controller
     {
         private 客戶資料Entities db = new 客戶資料Entities();
 
-        // GET: Customer
-        public ActionResult Index(String keyword)
+        // GET: Person
+        public ActionResult Index()
         {
-            var data = db.客戶資料.Where(p => p.是否已刪除 == false).AsQueryable();
-
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                data = data.Where(p => p.客戶名稱.Contains(keyword));
-            }
-
-            return View(data);
+            var 客戶聯絡人 = db.客戶聯絡人.Include(客 => 客.客戶資料);
+            return View(客戶聯絡人.ToList());
         }
 
-        // GET: Customer/Details/5
+        // GET: Person/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
-            if (客戶資料 == null || 客戶資料.是否已刪除 == true)
+            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
+            if (客戶聯絡人 == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶資料);
+            return View(客戶聯絡人);
         }
 
-        // GET: Customer/Create
+        // GET: Person/Create
         public ActionResult Create()
         {
+            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱");
             return View();
         }
 
-        // POST: Customer/Create
+        // POST: Person/Create
         // 若要免於過量張貼攻擊，請啟用想要繫結的特定屬性，如需
         // 詳細資訊，請參閱 https://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email")] 客戶資料 客戶資料)
+        public ActionResult Create([Bind(Include = "Id,客戶Id,職稱,姓名,Email,手機,電話")] 客戶聯絡人 客戶聯絡人)
         {
             if (ModelState.IsValid)
             {
-                db.客戶資料.Add(客戶資料);
+                db.客戶聯絡人.Add(客戶聯絡人);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
-            return View(客戶資料);
+            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶聯絡人.客戶Id);
+            return View(客戶聯絡人);
         }
 
-        // GET: Customer/Edit/5
+        // GET: Person/Edit/5
         public ActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
-            if (客戶資料 == null)
+            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
+            if (客戶聯絡人 == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶資料);
+            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶聯絡人.客戶Id);
+            return View(客戶聯絡人);
         }
 
-        // POST: Customer/Edit/5
+        // POST: Person/Edit/5
         // 若要免於過量張貼攻擊，請啟用想要繫結的特定屬性，如需
         // 詳細資訊，請參閱 https://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email")] 客戶資料 客戶資料)
+        public ActionResult Edit([Bind(Include = "Id,客戶Id,職稱,姓名,Email,手機,電話")] 客戶聯絡人 客戶聯絡人)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(客戶資料).State = EntityState.Modified;
+                db.Entry(客戶聯絡人).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View(客戶資料);
+            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶聯絡人.客戶Id);
+            return View(客戶聯絡人);
         }
 
-        // GET: Customer/Delete/5
+        // GET: Person/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
-            if (客戶資料 == null)
+            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
+            if (客戶聯絡人 == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶資料);
+            return View(客戶聯絡人);
         }
 
-        // POST: Customer/Delete/5
+        // POST: Person/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
-            //db.客戶資料.Remove(客戶資料);
-            客戶資料.是否已刪除 = true;
+            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
+            db.客戶聯絡人.Remove(客戶聯絡人);
             db.SaveChanges();
             return RedirectToAction("Index");
         }
